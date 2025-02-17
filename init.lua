@@ -121,6 +121,8 @@ vim.filetype.add {
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
+vim.keymap.set('n', '<leader>rf', '<cmd>RunCurrentFile<CR>', { desc = 'Run the current file' })
+
 --  open tmux-sessionizer
 vim.keymap.set('n', '<C-g>', '<cmd>!tmux neww tmux-sessionizer<CR>', { desc = 'Open Tmux Sessionizer' })
 --  open tmux-cht.sh cheatsheet
@@ -188,6 +190,63 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+local function create_floating_win()
+  local buf = vim.api.nvim_create_buf(false, true)
+  local width = math.floor(vim.o.columns * 0.9)
+  local height = math.floor(vim.o.lines * 0.8)
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+
+  local opts = {
+    style = 'minimal',
+    relative = 'editor',
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    border = 'rounded',
+  }
+
+  vim.api.nvim_buf_set_keymap(buf, 'n', 'q', '<cmd>q<CR>', { desc = 'exit this buffer' })
+
+  local win = vim.api.nvim_open_win(buf, true, opts)
+  return buf, win
+end
+
+vim.api.nvim_create_user_command('RunCurrentFile', function()
+  local filetype = vim.bo.filetype
+  local filename = vim.fn.expand '%'
+  local cmd
+
+  if filetype == 'python' then
+    cmd = 'python3 ' .. filename
+  elseif filetype == 'javascript' and filename == 'server.js' then
+    print 'yoyoyoy'
+  else
+    print('No run configuration for filetype: ' .. filetype)
+    return
+  end
+
+  local buf, _ = create_floating_win()
+  -- Run the command asynchronously and capture output
+  vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    stderr_buffered = true,
+    on_stdout = function(_, data)
+      if data then
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, data)
+      end
+    end,
+    on_stderr = function(_, data)
+      if data then
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, data)
+      end
+    end,
+  })
+
+  -- vim.cmd('!' .. cmd)
+end, { desc = 'Run the current file using the specified handler' })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -260,8 +319,8 @@ require('lazy').setup({
     'lewis6991/gitsigns.nvim',
     opts = {
       signs = {
-        add = { text = '+' },
-        change = { text = '~' },
+        add = { text = '▌' },
+        change = { text = '▌' },
         delete = { text = '_' },
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
@@ -379,16 +438,25 @@ require('lazy').setup({
         end,
       })
 
+      require 'telescope.actions'
+      local open_with_trouble = require('trouble.sources.telescope').open
+      local keymap = {
+        ['<C-t>'] = require('trouble.sources.telescope').open,
+        ['<C-T>'] = require('trouble.sources.telescope').add,
+      }
+
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          mappings = {
+            -- i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+            i = keymap,
+            n = keymap,
+          },
+        },
         pickers = {
           git_status = { path_display = filenameFirst },
           git_files = { path_display = filenameFirst },
@@ -611,7 +679,7 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         emmet_language_server = {
-          filetypes = { 'blade' },
+          filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'blade', 'vue', 'css', 'scss' },
         },
         -- gopls = {},
         -- pyright = {},
@@ -745,6 +813,7 @@ require('lazy').setup({
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-nvim-lsp-signature-help',
       'hrsh7th/cmp-path',
     },
     config = function()
@@ -818,10 +887,11 @@ require('lazy').setup({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'nvim_lsp_signature_help' },
         },
       }
       -- Add Vim-Dadbod completion to the list
-      cmp.setup.filetype({ 'sql' }, {
+      cmp.setup.filetype({ 'sql', 'mysql' }, {
         sources = {
           { name = 'vim-dadbod-completion' },
           { name = 'buffer' },
@@ -974,7 +1044,7 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
