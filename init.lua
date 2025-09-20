@@ -115,6 +115,7 @@ vim.opt.scrolloff = 999
 vim.filetype.add {
   pattern = {
     ['.*%.blade%.php'] = 'blade',
+    ['.*%.vue'] = 'vue',
   },
 }
 
@@ -275,8 +276,13 @@ require('lazy').setup({
   -- Neorg
   {
     'nvim-neorg/neorg',
-    lazy = false,
-    version = '8',
+    lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+    version = '*', -- Pin Neorg to the latest stable release
+    dependencies = {
+      'nvim-neorg/lua-utils.nvim',
+      'pysan3/pathlib.nvim',
+      'nvim-neotest/nvim-nio',
+    },
     config = function()
       require('neorg').setup {
         load = {
@@ -897,6 +903,21 @@ require('lazy').setup({
           { name = 'buffer' },
         },
       })
+      cmp.setup.filetype({ 'vue' }, {
+        sources = {
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'path' },
+          { name = 'nvim_lsp_signature_help' },
+        },
+      })
+      cmp.setup.filetype({ 'blade' }, {
+        sources = {
+          { name = 'codeium' },
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+        },
+      })
     end,
   },
 
@@ -995,6 +1016,8 @@ require('lazy').setup({
       require('nvim-treesitter.install').prefer_git = true
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
+
+      require('ibl').setup()
 
       local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
       parser_config.blade = {
