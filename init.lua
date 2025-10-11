@@ -224,6 +224,8 @@ vim.api.nvim_create_user_command('RunCurrentFile', function()
     cmd = 'python3 ' .. filename
   elseif filetype == 'javascript' and filename == 'server.js' then
     print 'yoyoyoy'
+  elseif filetype == 'javascript' then
+    cmd = 'node' .. ' ' .. filename
   else
     print('No run configuration for filetype: ' .. filetype)
     return
@@ -780,7 +782,7 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        javascript = { { 'prettierd', 'prettier' } },
+        javascript = { 'prettierd', 'prettier' },
       },
     },
   },
