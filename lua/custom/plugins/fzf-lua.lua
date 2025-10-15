@@ -89,7 +89,7 @@ return {
     -- Now replicate your Telescope mappings:
     vim.keymap.set('n', '<leader><leader>', fzf.git_files, { desc = 'Search [G]it [F]iles' })
     vim.keymap.set('n', '<leader>sf', fzf.files, { desc = '[S]earch [F]iles' })
-    vim.keymap.set('n', '<leader>snh', fzf.help_tags, { desc = '[S]earch [N]eovim [H]elp' })
+    vim.keymap.set('n', '<leader>svh', fzf.help_tags, { desc = '[S]earch [N]eovim [H]elp' })
     vim.keymap.set('n', '<leader>sw', fzf.grep_cword, { desc = '[S]earch current [W]ord' })
     vim.keymap.set('n', '<leader>/', fzf.live_grep, { desc = '[S]earch by [G]rep' })
     vim.keymap.set('n', '<leader>sG', fzf.live_grep_native, { desc = '[S]earch [G]rep (Native)' })
@@ -106,5 +106,17 @@ return {
 
     -- Custom blame picker with vertical layout override
     vim.keymap.set('n', '<leader>sb', fzf.git_blame, { desc = '[S]earch [B]lame (vertical view)' })
+
+    vim.keymap.set('n', '<leader>c/', function()
+      fzf.grep_curbuf { prompt_title = 'Grep in Current Buffer' }
+    end, { desc = 'Fuzzily search in [c]urrent buffer [/] ' })
+
+    vim.keymap.set('n', '<leader>s/', function()
+      fzf.live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' }
+    end, { desc = '[S]earch [/] in Open Files' })
+
+    vim.keymap.set('n', '<leader>sn', function()
+      fzf.files { cwd = vim.fn.stdpath 'config' }
+    end, { desc = '[S]earch [N]eovim files' })
   end,
 }
