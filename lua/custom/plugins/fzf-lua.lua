@@ -29,9 +29,8 @@ return {
         git_icons = true,
         file_icons = true,
         color_icons = true,
-        cmd = 'rg --files',
-        rg_opts = [[--color=never --hidden --files -g "!.git"]],
-        dir_opts = [[/s/b/a:-d]],
+
+        rg_opts = [[--color=never --hidden --files -g "!.git/*"]],
         hidden = true,
       },
       git = {
@@ -71,17 +70,23 @@ return {
       keymap = {
         builtin = {
           ['<Esc>'] = 'toggle-focus',
-          ['<C-j>'] = 'down',
-          ['<C-k>'] = 'up',
-          ['<C-n>'] = 'preview-page-down',
-          ['<C-p>'] = 'preview-page-up',
+          ['<C-n>'] = 'down',
+          ['<C-p>'] = 'up',
+          ['<C-j>'] = 'preview-page-down',
+          ['<C-k>'] = 'preview-page-up',
+          -- toggle preview
+          ['<C-q>'] = 'toggle-preview',
         },
         fzf = {
-          ['ctrl-n'] = 'preview-page-down',
-          ['ctrl-p'] = 'preview-page-up',
+          ['ctrl-j'] = 'preview-page-down',
+          ['ctrl-k'] = 'preview-page-up',
         },
       },
     }
+
+    local config = require 'fzf-lua.config'
+    local actions = require('trouble.sources.fzf').actions
+    config.defaults.actions.files['ctrl-t'] = actions.open
 
     -- optionally replace vim.ui.select
     vim.ui.select = fzf.fzf_select
@@ -101,7 +106,7 @@ return {
 
     -- Optional extras
     vim.keymap.set('n', '<leader>gs', fzf.git_status, { desc = '[S]earch [G]it Status' })
-    vim.keymap.set('n', '<leader>sc', fzf.git_commits, { desc = '[S]earch [C]ommits' })
+    vim.keymap.set('n', '<leader>sgc', fzf.git_commits, { desc = '[S]earch [G]it [C]ommits' })
     vim.keymap.set('n', '<leader>sh', fzf.git_bcommits, { desc = '[S]earch [H]istory' })
 
     -- Custom blame picker with vertical layout override

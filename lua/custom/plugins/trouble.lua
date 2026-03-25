@@ -1,16 +1,16 @@
 return {
   'folke/trouble.nvim',
+  opts = {},
   cmd = 'Trouble',
-  opts = { use_diagnostic_signs = true },
   keys = {
     {
       '<leader>xx',
-      '<cmd>Trouble diagnostics toggle<cr>',
+      '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
       desc = 'Diagnostics (Trouble)',
     },
     {
       '<leader>xX',
-      '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+      '<cmd>Trouble diagnostics toggle<cr>',
       desc = 'Buffer Diagnostics (Trouble)',
     },
     {
@@ -33,51 +33,5 @@ return {
       '<cmd>Trouble qflist toggle<cr>',
       desc = 'Quickfix List (Trouble)',
     },
-    {
-      '[q',
-      function()
-        if require('trouble').is_open() then
-          require('trouble').prev { skip_groups = true, jump = true }
-        else
-          local ok, err = pcall(vim.cmd.cprev)
-          if not ok then
-            vim.notify(err, vim.log.levels.ERROR)
-          end
-        end
-      end,
-      desc = 'Previous trouble/quickfix item',
-    },
-    {
-      ']q',
-      function()
-        if require('trouble').is_open() then
-          require('trouble').next { skip_groups = true, jump = true }
-        else
-          local ok, err = pcall(vim.cmd.cnext)
-          if not ok then
-            vim.notify(err, vim.log.levels.ERROR)
-          end
-        end
-      end,
-      desc = 'Next trouble/quickfix item',
-    },
   },
-  -- config = function()
-  --   local actions = require 'telescope.actions'
-  --   local open_with_trouble = require('trouble.sources.telescope').open
-  --
-  --   -- Use this to add more results without clearing the trouble list
-  --   local add_to_trouble = require('trouble.sources.telescope').add
-  --
-  --   local telescope = require 'telescope'
-  --
-  --   telescope.setup {
-  --     defaults = {
-  --       mappings = {
-  --         i = { ['<c-t>'] = open_with_trouble },
-  --         n = { ['<c-t>'] = open_with_trouble },
-  --       },
-  --     },
-  --   }
-  -- end,
 }
