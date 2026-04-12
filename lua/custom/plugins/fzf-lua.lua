@@ -83,13 +83,19 @@ return {
         },
       },
     }
+    -- lsp = {
+    --   code_actions = {
+    --     previewer = 'codeaction_native',
+    --     preview_pager = "delta --side-by-side --width=$FZF_PREVIEW_COLUMNS --hunk-header-style='omit' --file-style='omit'",
+    --   },
+    -- },
 
     local config = require 'fzf-lua.config'
     local actions = require('trouble.sources.fzf').actions
     config.defaults.actions.files['ctrl-t'] = actions.open
 
     -- optionally replace vim.ui.select
-    vim.ui.select = fzf.fzf_select
+    -- vim.ui.select = fzf.fzf_select
 
     -- Now replicate your Telescope mappings:
     vim.keymap.set('n', '<leader><leader>', fzf.git_files, { desc = 'Search [G]it [F]iles' })
@@ -123,5 +129,17 @@ return {
     vim.keymap.set('n', '<leader>sn', function()
       fzf.files { cwd = vim.fn.stdpath 'config' }
     end, { desc = '[S]earch [N]eovim files' })
+
+    -- keymap('<leader>ca', function()
+    --     require('fzf-lua').lsp_code_actions {
+    --         winopts = {
+    --             relative = 'cursor',
+    --             width = 0.6,
+    --             height = 0.6,
+    --             row = 1,
+    --             preview = { vertical = 'up:70%' },
+    --         },
+    --     }
+    -- end, 'Code actions', { 'n', 'v' })
   end,
 }
