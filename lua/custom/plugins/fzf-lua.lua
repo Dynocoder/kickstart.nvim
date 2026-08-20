@@ -89,7 +89,7 @@ return {
     config.defaults.actions.files['ctrl-t'] = actions.open
 
     -- optionally replace vim.ui.select
-    vim.ui.select = fzf.fzf_select
+    -- vim.ui.select = fzf.fzf_select
 
     -- Now replicate your Telescope mappings:
     vim.keymap.set('n', '<leader><leader>', fzf.git_files, { desc = 'Search [G]it [F]iles' })
